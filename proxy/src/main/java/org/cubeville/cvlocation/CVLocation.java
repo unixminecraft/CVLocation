@@ -5,107 +5,39 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.UUID;
 
-import org.cubeville.cvchat.playerdata.PlayerDataManager;
 import org.cubeville.cvipc.CVIPC;
 import org.cubeville.cvipc.IPCInterface;
+import org.cubeville.cvlocation.commands.WhereAmICommand;
+import org.cubeville.cvlocation.commands.WhereCommand;
 
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.ChatEvent;
-import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
-import net.md_5.bungee.event.EventHandler;
 
-public class CVLocation extends Plugin implements Listener, IPCInterface {
+public class CVLocation extends Plugin implements IPCInterface {
     
     private CVIPC ipc;
     
     @Override
     public void onEnable() {
         PluginManager pluginManager = getProxy().getPluginManager();
-        pluginManager.registerListener(this, this);
-        this.ipc = (CVIPC) pluginManager.getPlugin("CVIPC");
-        this.ipc.registerInterface("locationotherreceive", this);
+        ipc = (CVIPC) pluginManager.getPlugin("CVIPC");
+        ipc.registerInterface("locationresponse", this);
+        pluginManager.registerCommand(this, new WhereCommand(ipc));
+        pluginManager.registerCommand(this, new WhereAmICommand(ipc));
     }
     
     @Override
     public void onDisable() {
-        this.ipc.deregisterInterface("locationotherreceive");
-        this.ipc = null;
-    }
-    
-    @SuppressWarnings("deprecation")
-    @EventHandler
-    public void onChatEvent(ChatEvent event) {
-        if(!event.isCommand()) { return; }
-        StringTokenizer tokenizer = new StringTokenizer(event.getMessage(), " ");
-        List<String> parameters = new ArrayList<String>();
-        for(int i = 0; i < 3 && tokenizer.hasMoreTokens(); i++) {
-            parameters.add(tokenizer.nextToken());
-        }
-        if(parameters.size() <= 0) { return; }
-        if(!parameters.get(0).equals("/where")) { return; }
-        Connection sender = event.getSender();
-        if(!(sender instanceof ProxiedPlayer)) { return; }
-        ProxiedPlayer player = (ProxiedPlayer) sender;
-        boolean adminOverride = player.hasPermission("cvlocation.limited");
-        boolean saOverride = player.hasPermission("cvlocation.unlimited");
-        if(parameters.size() >= 3) {
-            if(saOverride || adminOverride) {
-                player.sendMessage("§cSyntax: /where [player]");
-                return;
-            }
-            else {
-                player.sendMessage("§cSyntax: /where");
-                return;
-            }
-        }
-        event.setCancelled(true);
-        UUID playerID = player.getUniqueId();
-        if(parameters.size() == 1) {
-            String serverName = player.getServer().getInfo().getName();
-            String ipcMessage = "locationself|" + playerID.toString();
-            this.ipc.sendMessage(serverName, ipcMessage);
-        }
-        else {
-            if(!adminOverride && !saOverride) {
-                player.sendMessage("§cNo permission.");
-                return;
-            }
-            PlayerDataManager playerDataManager = PlayerDataManager.getInstance();
-            String queryPlayerName = parameters.get(1);
-            UUID queryPlayerID = playerDataManager.getPlayerId(queryPlayerName);
-            if(queryPlayerID == null) {
-                player.sendMessage("§cPlayer not found!");
-                return;
-            }
-            if(!saOverride && !playerDataManager.outranks(playerID, queryPlayerID)) {
-                player.sendMessage("§cNo permission.");
-                return;
-            }
-            ProxiedPlayer queryPlayer = null;
-            for(ProxiedPlayer p: ProxyServer.getInstance().getPlayers()) {
-                if(p.getUniqueId().equals(queryPlayerID)) {
-                    queryPlayer = p;
-                    break;
-                }
-            }
-            if(queryPlayer == null) {
-                player.sendMessage("§cPlayer not online!");
-                return;
-            }
-            String serverName = queryPlayer.getServer().getInfo().getName();
-            String ipcMessage = "locationothersend|" + playerID.toString() + "|" + queryPlayerID.toString();
-            this.ipc.sendMessage(serverName, ipcMessage);
-        }
+        ipc.deregisterInterface("locationresponse");
+        ipc = null;
     }
     
     @SuppressWarnings("deprecation")
     @Override
     public void process(String serverName, String channel, String message) {
-        if(channel.equals("locationotherreceive")) {
+        if(channel.equals("locationresponse")) {
             List<String> parameters = getMessageParts(message);
             if(parameters.size() != 7) { return; }
             parameters = processParameters(parameters);

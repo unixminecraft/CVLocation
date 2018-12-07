@@ -18,50 +18,55 @@ public class CVLocation extends JavaPlugin implements IPCInterface {
     @Override
     public void onEnable() {
         PluginManager pluginManager = getServer().getPluginManager();
-        this.ipc = (CVIPC) pluginManager.getPlugin("CVIPC");
-        this.ipc.registerInterface("locationself", this);
-        this.ipc.registerInterface("locationothersend", this);
+        ipc = (CVIPC) pluginManager.getPlugin("CVIPC");
+        ipc.registerInterface("locationquery", this);
     }
     
     @Override
     public void onDisable() {
-        this.ipc.deregisterInterface("locationothersend");
-        this.ipc.deregisterInterface("locationself");
-        this.ipc = null;
+        ipc.deregisterInterface("locationquery");
+        ipc = null;
     }
     
     @Override
     public void process(String channel, String message) {
-        if(channel.equals("locationself")) {
-            UUID senderID = UUID.fromString(message);
-            Player sender = getServer().getPlayer(senderID);
-            if(sender == null) { return; }
-            List<String> location = processLocation(sender.getLocation());
-            String line1 = "§ePlayer: " + sender.getName() + " (That's you!)§r\n";
-            String line2 = "§eServer: " + getServer().getName() + "§r\n";
-            String line3 = "§eWorld: " + location.get(0) + "§r\n";
-            String line4 = "§eLocation: (" + location.get(1) + ", " + location.get(2) + ", " + location.get(3) + ")§r\n";
-            String line5 = "§eDirection: " + location.get(4) + "§r\n";
-            boolean adminOverride = sender.hasPermission("cvlocation.limited") || sender.hasPermission("cvlocation.unlimited");
-            if(adminOverride) {
-                sender.sendMessage(line1 + line2 + line3 + line4 + line5);
+        if(channel.equals("locationquery")) {
+            int index = message.indexOf("|");
+            if(index == -1) {
+                UUID senderID = UUID.fromString(message);
+                Player sender = getServer().getPlayer(senderID);
+                if(sender == null) { return; }
+                List<String> location = processLocation(sender.getLocation());
+                String line1 = "§ePlayer: " + sender.getName() + " (That's you!)§r\n";
+                String line2 = "§eServer: " + getServer().getName() + "§r\n";
+                String line3 = "§eWorld: " + location.get(0) + "§r\n";
+                String line4 = "§eLocation: (" + location.get(1) + ", " + location.get(2) + ", " + location.get(3) + ")§r\n";
+                String line5 = "§eDirection: " + location.get(4) + "§r\n";
+                boolean adminOverride = sender.hasPermission("cvlocation.limited") || sender.hasPermission("cvlocation.unlimited");
+                if(adminOverride) {
+                    sender.sendMessage(line1 + line2 + line3 + line4 + line5);
+                }
+                else {
+                    sender.sendMessage(line1 + line4 + line5);
+                }
+                
             }
             else {
-                sender.sendMessage(line1 + line4 + line5);
+                String senderIDString = message.substring(0, index);
+                String playerIDString = message.substring(index + 1);
+                UUID playerID = UUID.fromString(playerIDString);
+                Player player = getServer().getPlayer(playerID);
+                if(player == null) { return; }
+                if(!player.isOnline()) { return; }
+                Location location = player.getLocation();
+                String locationWorld = location.getWorld().getName();
+                String locationX = Double.toString(location.getX());
+                String locationY = Double.toString(location.getY());
+                String locationZ = Double.toString(location.getZ());
+                String locationYaw = Float.toString(location.getYaw());
+                String ipcMessage = "locationresponse|" + senderIDString + "|" + player.getName() + "|" + locationWorld + "|" + locationX + "|" + locationY + "|" + locationZ + "|" + locationYaw;
+                ipc.sendMessage(ipcMessage);
             }
-        }
-        else if(channel.equals("locationothersend")) {
-            int index = message.indexOf("|");
-            if(index == -1) { return; }
-            String senderIDString = message.substring(0, index);
-            String playerIDString = message.substring(index + 1);
-            UUID playerID = UUID.fromString(playerIDString);
-            Player player = getServer().getPlayer(playerID);
-            if(player == null) { return; }
-            if(!player.isOnline()) { return; }
-            Location location = player.getLocation();
-            String ipcMessage = "locationotherreceive|" + senderIDString + "|" + player.getName() + "|" + location.getWorld().getName() + "|" + Double.valueOf(location.getX()).toString() + "|" + Double.valueOf(location.getY()).toString() + "|" + Double.valueOf(location.getZ()).toString() + "|" + Float.valueOf(location.getYaw()).toString();
-            this.ipc.sendMessage(ipcMessage);
         }
     }
     
