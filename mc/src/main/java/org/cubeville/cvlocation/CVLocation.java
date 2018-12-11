@@ -29,33 +29,22 @@ public class CVLocation extends JavaPlugin implements IPCInterface {
     @Override
     public void process(String channel, String message) {
         if(channel.equals("locationquery")) {
-            Player player;
-            UUID senderID;
-            {
-                int index = message.indexOf("|");
-                if(index == -1) {
-                    senderID = UUID.fromString(message);
-                }
-                else {
-                    senderID = UUID.fromString(message.substring(0, index));
-                }
-                player = getServer().getPlayer(senderID);
-            }
-
+            int index = message.indexOf("|");
+            if(index == -1) { return; }
+            String senderId = message.substring(0, index);
+            UUID playerId = UUID.fromString(message.substring(index + 1));
+            if(playerId == null) { return; }
+            Player player = getServer().getPlayer(playerId);
             if(player == null) { return; }
             if(!player.isOnline()) { return; }
-
             Location location = player.getLocation();
             String locationWorld = location.getWorld().getName();
             String locationX = Double.toString(location.getX());
             String locationY = Double.toString(location.getY());
             String locationZ = Double.toString(location.getZ());
             String locationYaw = Float.toString(location.getYaw());
-
-            String ipcMessage = "locationresponse|" + senderID.toString() + "|" + player.getName() + "|" + locationWorld + "|" + locationX + "|" + locationY + "|" + locationZ + "|" + locationYaw;
-
+            String ipcMessage = "locationresponse|" + senderId + "|" + player.getName() + "|" + locationWorld + "|" + locationX + "|" + locationY + "|" + locationZ + "|" + locationYaw;
             ipc.sendMessage(ipcMessage);
         }
     }
-    
 }

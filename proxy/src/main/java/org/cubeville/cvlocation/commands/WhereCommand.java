@@ -29,14 +29,14 @@ public class WhereCommand extends Command {
         boolean saOverride = sender.hasPermission("cvlocation.unlimited");
         if(args.length == 0) {
             String serverName = sender.getServer().getInfo().getName();
-            String ipcMessage = "locationquery|" + senderID.toString();
+            String ipcMessage = "locationquery|" + senderID.toString() + "|" + senderID.toString();
             ipc.sendMessage(serverName, ipcMessage);
         }
         else if(args.length == 1) {
             String playerName = args[0];
             if(sender.getName().equalsIgnoreCase(playerName)) {
                 String serverName = sender.getServer().getInfo().getName();
-                String ipcMessage = "locationquery|" + senderID.toString();
+                String ipcMessage = "locationquery|" + senderID.toString() + "|" + senderID.toString();
                 ipc.sendMessage(serverName, ipcMessage);
             }
             else if(adminOverride || saOverride) {
