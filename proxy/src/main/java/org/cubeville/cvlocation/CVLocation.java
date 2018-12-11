@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import org.cubeville.cvipc.CVIPC;
 import org.cubeville.cvipc.IPCInterface;
-import org.cubeville.cvlocation.commands.WhereAmICommand;
 import org.cubeville.cvlocation.commands.WhereCommand;
 
 import net.md_5.bungee.api.ProxyServer;
@@ -25,7 +24,6 @@ public class CVLocation extends Plugin implements IPCInterface {
         ipc = (CVIPC) pluginManager.getPlugin("CVIPC");
         ipc.registerInterface("locationresponse", this);
         pluginManager.registerCommand(this, new WhereCommand(ipc));
-        pluginManager.registerCommand(this, new WhereAmICommand(ipc));
     }
     
     @Override
@@ -43,12 +41,31 @@ public class CVLocation extends Plugin implements IPCInterface {
             parameters = processParameters(parameters);
             UUID senderID = UUID.fromString(parameters.get(0));
             ProxiedPlayer sender = ProxyServer.getInstance().getPlayer(senderID);
+            boolean samePlayer = sender.getName().equalsIgnoreCase(parameters.get(1));
+            boolean adminOverride = sender.hasPermission("cvlocation.limited");
+            boolean saOverride = sender.hasPermission("cvlocation.unlimited");
             String line1 = "§ePlayer: " + parameters.get(1) + "§r\n";
             String line2 = "§eServer: " + serverName + "§r\n";
             String line3 = "§eWorld: " + parameters.get(2) + "§r\n";
             String line4 = "§eLocation: (" + parameters.get(3) + ", " + parameters.get(4) + ", " + parameters.get(5) + ")§r\n";
             String line5 = "§eDirection: " + parameters.get(6) + "§r\n";
-            sender.sendMessage(line1 + line2 + line3 + line4 + line5);
+            if(samePlayer) {
+                line1 = "§ePlayer: " + parameters.get(1) + " (That's you!)§r\n";
+                if(adminOverride || saOverride) {
+                    sender.sendMessage(line1 + line2 + line3 + line4 + line5);
+                }
+                else {
+                    sender.sendMessage(line1 + line4 + line5);
+                }
+            }
+            else {
+                if(adminOverride || saOverride) {
+                    sender.sendMessage(line1 + line2 + line3 + line4 + line5);
+                }
+                else {
+                    sender.sendMessage("§cNo permission.");
+                }
+            }
         }
     }
     

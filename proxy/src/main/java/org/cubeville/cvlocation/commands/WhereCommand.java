@@ -15,7 +15,7 @@ public class WhereCommand extends Command {
     private CVIPC ipc;
     
     public WhereCommand(CVIPC ipcIn) {
-        super("where");
+        super("where", null, "whereami");
         ipc = ipcIn;
     }
     
@@ -52,10 +52,6 @@ public class WhereCommand extends Command {
                     return;
                 }
                 UUID playerID = player.getUniqueId();
-                if(playerID == null) {
-                    sender.sendMessage("§cInternal error, please try again later.");
-                    return;
-                }
                 if(!saOverride && !PlayerDataManager.getInstance().outranks(senderID, playerID)) {
                     sender.sendMessage("§cNo permission.");
                     return;

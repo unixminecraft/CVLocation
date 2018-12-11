@@ -2,3 +2,4 @@ name: CVLocation
 main: org.cubeville.cvlocation.CVLocation
 authors: [unixadmin]
 version: 0.1
+depends: ['CVIPC']
