@@ -39,9 +39,9 @@ public class CVLocation extends JavaPlugin implements IPCInterface {
             if(!player.isOnline()) { return; }
             Location location = player.getLocation();
             String locationWorld = location.getWorld().getName();
-            String locationX = Double.toString(location.getX());
-            String locationY = Double.toString(location.getY());
-            String locationZ = Double.toString(location.getZ());
+            String locationX = Double.toString((int) location.getX());
+            String locationY = Double.toString((int) location.getY());
+            String locationZ = Double.toString((int) location.getZ());
             String locationYaw = Float.toString(location.getYaw());
             String ipcMessage = "locationresponse|" + senderId + "|" + player.getName() + "|" + locationWorld + "|" + locationX + "|" + locationY + "|" + locationZ + "|" + locationYaw;
             ipc.sendMessage(ipcMessage);
