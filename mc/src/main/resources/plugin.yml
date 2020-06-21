@@ -3,3 +3,4 @@ main: org.cubeville.cvlocation.CVLocation
 authors: [unixadmin]
 version: 0.1
 depend: [CVIPC]
+api-version: 1.15
