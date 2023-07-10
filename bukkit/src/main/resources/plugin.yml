@@ -1,0 +1,6 @@
+name: BungeeLocation
+main: org.cubeville.location.bukkit.BukkitLocationPlugin
+authors: [mciolkosz]
+version: 1.1.0
+depend: [CVIPC,WorldEdit,WorldGuard]
+api-version: '1.20'

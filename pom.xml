@@ -1,0 +1,149 @@
+<!--
+  ~ This file is part of the BungeeLocation plugins for Bukkit servers and
+  ~ BungeeCord proxies for Minecraft.
+  ~ 
+  ~ Copyright (C) 2018-2023 Matt Ciolkosz (https://github.com/mciolkosz/)
+  ~ Copyright (C) 2018-2023 Cubeville (https://www.cubeville.org/)
+  ~ 
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~ 
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~ 
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <groupId>org.cubeville.location</groupId>
+    <artifactId>location-parent</artifactId>
+    <version>1.1.0</version>
+    <packaging>pom</packaging>
+    
+    <name>CVLocation</name>
+    <description>A set of plugins for Bukkit servers and BungeeCord proxies to determine the location of a player on a Minecraft network.</description>
+    <url>https://github.com/unixminecraft/CVLocation/</url>
+    
+    <licenses>
+        <license>
+            <name>GNU General Public License, Version 3</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.en.html</url>
+        </license>
+    </licenses>
+    
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/unixminecraft/CVLocation/issues/</url>
+    </issueManagement>
+    
+    <modules>
+        <module>core</module>
+        <module>bukkit</module>
+        <module>bungeecord</module>
+    </modules>
+    
+    <repositories>
+        <repository>
+            <id>oss-sonatype-releases</id>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>oss-sonatype-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>spigotmc-hub-snapshots</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>enginehub-releases</id>
+            <url>https://maven.enginehub.org/repo/</url>
+        </repository>
+    </repositories>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+    
+    <pluginRepositories>
+        <pluginRepository>
+            <id>apache-maven-releases</id>
+            <url>https://repository.apache.org/content/repositories/releases/</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>apache-maven-snapshots</id>
+            <url>https://repository.apache.org/content/respositories/snapshots/</url>
+        </pluginRepository>
+    </pluginRepositories>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                        <configuration>
+                            <keyname>${gpg.keyname}</keyname>
+                            <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    
+</project>
