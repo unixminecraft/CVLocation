@@ -119,23 +119,23 @@ public final class WhereCommand extends Command implements TabExecutor {
         
         final UUID targetId = this.playerDataManager.getPlayerByVisibleName(targetName);
         if (targetId == null) {
-            sender.sendMessage(new ComponentBuilder(targetName).color(ChatColor.GOLD).append(" is not online.").color(ChatColor.RED).create());
+            sender.sendMessage(new ComponentBuilder("Unknown player ").color(ChatColor.RED).append(targetName).color(ChatColor.GOLD).create());
             return;
         }
         
         final String displayName = this.playerDataManager.getPlayerVisibleName(targetId);
-        final ProxiedPlayer target = this.proxy.getPlayer(targetId);
-        if (target == null) {
-            sender.sendMessage(new ComponentBuilder(displayName).color(ChatColor.GOLD).append(" is not online.").color(ChatColor.RED).create());
-            return;
-        }
-        
         if (!unlimited && !this.playerDataManager.outranks(senderId, targetId)) {
             
             final ComponentBuilder builder = new ComponentBuilder("You do not have permission to check ").color(ChatColor.RED);
             builder.append(displayName + "'s").color(ChatColor.GOLD);
             builder.append(" location.").color(ChatColor.RED);
             sender.sendMessage(builder.create());
+            return;
+        }
+        
+        final ProxiedPlayer target = this.proxy.getPlayer(targetId);
+        if (target == null) {
+            sender.sendMessage(new ComponentBuilder(displayName).color(ChatColor.GOLD).append(" is not online.").color(ChatColor.RED).create());
             return;
         }
         

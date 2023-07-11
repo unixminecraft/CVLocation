@@ -152,8 +152,11 @@ public final class BungeeLocationPlugin extends Plugin implements IPCInterface {
         final String direction = this.processYaw(iterator.next());
         
         final CommandSender sender;
+        final boolean samePlayer;
+        
         if (rawSenderId.equalsIgnoreCase(this.proxy.getConsole().getName())) {
             sender = this.proxy.getConsole();
+            samePlayer = false;
         } else {
             
             final UUID senderId;
@@ -172,6 +175,8 @@ public final class BungeeLocationPlugin extends Plugin implements IPCInterface {
                 logger.log(Level.WARNING, "Message: " + message);
                 return;
             }
+            
+            samePlayer = rawSenderId.equalsIgnoreCase(rawTargetId);
         }
         
         final UUID targetId;
@@ -200,8 +205,6 @@ public final class BungeeLocationPlugin extends Plugin implements IPCInterface {
                 }
             }
         }
-        
-        final boolean samePlayer = sender.getName().equalsIgnoreCase(targetName);
         
         final boolean unlimited = sender.hasPermission(PERMISSION_UNLIMITED);
         final boolean limited = sender.hasPermission(PERMISSION_LIMITED);
