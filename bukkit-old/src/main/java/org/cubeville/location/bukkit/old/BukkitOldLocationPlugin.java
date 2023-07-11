@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.cubeville.location.bukkit;
+package org.cubeville.location.bukkit.old;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -54,7 +54,7 @@ import org.jetbrains.annotations.UnmodifiableView;
  * This also represents the {@link IPCInterface} for receiving and processing
  * location request IPC messages.
  */
-public final class BukkitLocationPlugin extends JavaPlugin implements IPCInterface {
+public final class BukkitOldLocationPlugin extends JavaPlugin implements IPCInterface {
     
     private Server server;
     private CVIPC ipcPlugin;
@@ -203,7 +203,7 @@ public final class BukkitLocationPlugin extends JavaPlugin implements IPCInterfa
     /**
      * Processes the given whole IPC message into a {@link List} of various
      * parts.
-     * 
+     *
      * @param message The full IPC message.
      * @return The separated parts of the IPC message.
      */

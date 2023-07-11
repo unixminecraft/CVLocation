@@ -1,6 +1,6 @@
 /* 
- * This file is part of the BungeeLocation plugins for Bukkit servers and
- * BungeeCord proxies for Minecraft.
+ * This file is part of the CVLocation plugins for Bukkit servers and BungeeCord
+ * proxies for Minecraft.
  * 
  * Copyright (C) 2018-2023 Matt Ciolkosz (https://github.com/mciolkosz/)
  * Copyright (C) 2018-2023 Cubeville (https://www.cubeville.org/)
@@ -23,6 +23,8 @@ package org.cubeville.location.bungeecord.command;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import net.md_5.bungee.api.ChatColor;
@@ -32,19 +34,21 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.plugin.TabExecutor;
 import org.cubeville.location.bungeecord.BungeeLocationPlugin;
-import org.bspfsystems.bungeelocation.core.IPCConstants;
+import org.bspfsystems.bungeelocation.core.LocationConstants;
 import org.cubeville.cvipc.CVIPC;
 import org.cubeville.cvplayerdata.CVPlayerData;
 import org.cubeville.cvplayerdata.playerdata.PlayerDataManager;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
 /**
  * Represents a {@link Command} that allows a {@link ProxiedPlayer} to check
  * their location, or the location of another {@link ProxiedPlayer}, if they
  * have permission.
  */
-public final class WhereCommand extends Command {
+public final class WhereCommand extends Command implements TabExecutor {
     
     private final ProxyServer proxy;
     private final CVIPC ipcPlugin;
@@ -281,11 +285,110 @@ public final class WhereCommand extends Command {
     private void queryLocation(@NotNull final String serverName, @NotNull final String senderId, @NotNull final String targetId, final boolean getRegions) {
         
         final StringBuilder builder = new StringBuilder();
-        builder.append(IPCConstants.REQUEST_CHANNEL).append(IPCConstants.SEPARATOR);
-        builder.append(senderId).append(IPCConstants.SEPARATOR);
-        builder.append(targetId).append(IPCConstants.SEPARATOR);
+        builder.append(LocationConstants.REQUEST_CHANNEL).append(LocationConstants.SEPARATOR);
+        builder.append(senderId).append(LocationConstants.SEPARATOR);
+        builder.append(targetId).append(LocationConstants.SEPARATOR);
         builder.append(getRegions);
         
         this.ipcPlugin.sendMessage(serverName, builder.toString());
+    }
+    
+    /**
+     * Provides tab-completion suggestions for the given {@link CommandSender}.
+     * 
+     * @param sender The {@link CommandSender} requesting tab-completions.
+     * @param args The current command line arguments.
+     * @return A {@link Iterable} of potential tab-completions.
+     */
+    @Override
+    @NotNull
+    @UnmodifiableView
+    public Iterable<String> onTabComplete(@NotNull final CommandSender sender, @NotNull final String[] args) {
+        
+        final List<String> argsList = new ArrayList<String>(Arrays.asList(args));
+        final Collection<String> completions = new ArrayList<String>();
+        
+        final boolean unlimited;
+        final boolean limited;
+        
+        final Collection<ProxiedPlayer> players = this.proxy.getPlayers();
+        if (!(sender instanceof ProxiedPlayer)) {
+            
+            for (final ProxiedPlayer player : players) {
+                final String name = player.getName();
+                final String displayName = this.playerDataManager.getPlayerVisibleName(player.getUniqueId());
+                completions.add(player.getName());
+                if (!displayName.equalsIgnoreCase(name)) {
+                    completions.add(displayName);
+                }
+            }
+            
+            unlimited = true;
+            limited = true;
+            
+        } else if (sender.hasPermission(BungeeLocationPlugin.PERMISSION_UNLIMITED)) {
+            
+            for (final ProxiedPlayer player : players) {
+                final String name = player.getName();
+                final String displayName = this.playerDataManager.getPlayerVisibleName(player.getUniqueId());
+                completions.add(player.getName());
+                if (!displayName.equalsIgnoreCase(name)) {
+                    completions.add(displayName);
+                }
+            }
+            
+            unlimited = true;
+            limited = false;
+            
+        } else if (sender.hasPermission(BungeeLocationPlugin.PERMISSION_LIMITED)) {
+            
+            for (final ProxiedPlayer player : players) {
+                final UUID senderId = ((ProxiedPlayer) sender).getUniqueId();
+                final UUID targetId = player.getUniqueId();
+                if (!this.playerDataManager.outranks(senderId, targetId)) {
+                    continue;
+                }
+                
+                final String name = player.getName();
+                final String displayName = this.playerDataManager.getPlayerVisibleName(player.getUniqueId());
+                completions.add(player.getName());
+                if (!displayName.equalsIgnoreCase(name)) {
+                    completions.add(displayName);
+                }
+            }
+            
+            unlimited = false;
+            limited = true;
+            
+        } else {
+            unlimited = false;
+            limited = false;
+        }
+        
+        if (argsList.isEmpty()) {
+            return Collections.unmodifiableCollection(completions);
+        }
+        
+        if (!unlimited && !limited) {
+            return Collections.emptyList();
+        }
+        
+        final String targetName = argsList.remove(0);
+        if (argsList.isEmpty()) {
+            completions.removeIf(completion -> !completion.toLowerCase().startsWith(targetName.toLowerCase()));
+            return Collections.unmodifiableCollection(completions);
+        }
+        
+        completions.clear();
+        completions.add("-r");
+        completions.add("--regions");
+        
+        final String regionFlag = argsList.remove(0);
+        if (argsList.isEmpty()) {
+            completions.removeIf(completion -> !completion.toLowerCase().startsWith(regionFlag.toLowerCase()));
+            return Collections.unmodifiableCollection(completions);
+        }
+        
+        return Collections.emptyList();
     }
 }

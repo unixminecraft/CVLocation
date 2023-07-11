@@ -1,6 +1,6 @@
 name: CVLocation
-main: org.cubeville.location.bukkit.BukkitLocationPlugin
+main: org.cubeville.location.bukkit.old.BukkitOldLocationPlugin
 author: mciolkosz
 version: 1.1.0
 depend: [CVIPC,WorldEdit,WorldGuard]
-api-version: '1.20'
+api-version: '1.18'

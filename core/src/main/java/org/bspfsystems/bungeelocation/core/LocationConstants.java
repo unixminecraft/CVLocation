@@ -1,5 +1,5 @@
 /* 
- * This file is part of the BungeeLocation plugins for Bukkit servers and
+ * This file is part of the CVLocation plugins for Bukkit servers and
  * BungeeCord proxies for Minecraft.
  * 
  * Copyright (C) 2018-2023 Matt Ciolkosz (https://github.com/mciolkosz/)
@@ -22,10 +22,10 @@
 package org.bspfsystems.bungeelocation.core;
 
 /**
- * This class provides constants for the IPC communications for the
- * BungeeLocations plugin set.
+ * This class provides constants for the Bukkit and BungeeCord plugins of
+ * the CVLocation plugin set.
  */
-public final class IPCConstants {
+public final class LocationConstants {
     
     /**
      * The separator to use between data items in an IPC message.
@@ -43,6 +43,11 @@ public final class IPCConstants {
     public static final String RESPONSE_CHANNEL = "locationresponse";
     
     /**
+     * The global WorldGuard region name.
+     */
+    public static final String REGION_GLOBAL = "__global__";
+    
+    /**
      * The unknown region list, used if the Bukkit plugin cannot determine what
      * WorldGuard regions the target player is standing in.
      */
@@ -51,7 +56,7 @@ public final class IPCConstants {
     /**
      * Prevents instantiation of this utility class.
      */
-    private IPCConstants() {
+    private LocationConstants() {
         // Do nothing.
     }
 }

@@ -1,5 +1,5 @@
 <!--
-  ~ This file is part of the BungeeLocation plugins for Bukkit servers and
+  ~ This file is part of the CVLocation plugins for Bukkit servers and
   ~ BungeeCord proxies for Minecraft.
   ~ 
   ~ Copyright (C) 2018-2023 Matt Ciolkosz (https://github.com/mciolkosz/)
@@ -46,6 +46,7 @@
     <modules>
         <module>core</module>
         <module>bukkit</module>
+        <module>bukkit-old</module>
         <module>bungeecord</module>
     </modules>
     

@@ -1,6 +1,6 @@
 /* 
- * This file is part of the BungeeLocation plugins for Bukkit servers and
- * BungeeCord proxies for Minecraft.
+ * This file is part of the CVLocation plugins for Bukkit servers and BungeeCord
+ * proxies for Minecraft.
  * 
  * Copyright (C) 2018-2023 Matt Ciolkosz (https://github.com/mciolkosz/)
  * Copyright (C) 2018-2023 Cubeville (https://www.cubeville.org/)
@@ -38,7 +38,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 import org.cubeville.location.bungeecord.command.WhereCommand;
-import org.bspfsystems.bungeelocation.core.IPCConstants;
+import org.bspfsystems.bungeelocation.core.LocationConstants;
 import org.cubeville.cvipc.CVIPC;
 import org.cubeville.cvipc.IPCInterface;
 import org.cubeville.cvplayerdata.CVPlayerData;
@@ -93,7 +93,7 @@ public final class BungeeLocationPlugin extends Plugin implements IPCInterface {
         
         pluginManager.registerCommand(this, new WhereCommand(this.proxy, this.ipcPlugin, this.playerDataPlugin));
         
-        this.ipcPlugin.registerInterface(IPCConstants.RESPONSE_CHANNEL, this);
+        this.ipcPlugin.registerInterface(LocationConstants.RESPONSE_CHANNEL, this);
     }
     
     /**
@@ -101,7 +101,7 @@ public final class BungeeLocationPlugin extends Plugin implements IPCInterface {
      */
     @Override
     public void onDisable() {
-        this.ipcPlugin.deregisterInterface(IPCConstants.RESPONSE_CHANNEL);
+        this.ipcPlugin.deregisterInterface(LocationConstants.RESPONSE_CHANNEL);
     }
     
     /**
@@ -130,8 +130,8 @@ public final class BungeeLocationPlugin extends Plugin implements IPCInterface {
     public void process(final String serverName, final String channel, final String message) {
         
         final Logger logger = this.getLogger();
-        if (!channel.equalsIgnoreCase(IPCConstants.RESPONSE_CHANNEL)) {
-            logger.log(Level.WARNING, "Invalid channel for BungeeCord Location plugin: " + channel + ". Channel should be " + IPCConstants.RESPONSE_CHANNEL);
+        if (!channel.equalsIgnoreCase(LocationConstants.RESPONSE_CHANNEL)) {
+            logger.log(Level.WARNING, "Invalid channel for BungeeCord Location plugin: " + channel + ". Channel should be " + LocationConstants.RESPONSE_CHANNEL);
             return;
         }
         
@@ -190,7 +190,7 @@ public final class BungeeLocationPlugin extends Plugin implements IPCInterface {
             regions = null;
         } else {
             final String first = iterator.next();
-            if (first.equalsIgnoreCase(IPCConstants.REGIONS_UNKNOWN)) {
+            if (first.equalsIgnoreCase(LocationConstants.REGIONS_UNKNOWN)) {
                 regions = Collections.emptyList();
             } else {
                 regions = new ArrayList<String>();
@@ -231,7 +231,7 @@ public final class BungeeLocationPlugin extends Plugin implements IPCInterface {
     private List<String> getMessageParts(final String message) {
         
         final List<String> parts = new ArrayList<String>();
-        final StringTokenizer tokenizer = new StringTokenizer(message, IPCConstants.SEPARATOR);
+        final StringTokenizer tokenizer = new StringTokenizer(message, LocationConstants.SEPARATOR);
         
         while(tokenizer.hasMoreTokens()) {
             parts.add(tokenizer.nextToken());
@@ -324,6 +324,7 @@ public final class BungeeLocationPlugin extends Plugin implements IPCInterface {
         }
         sender.sendMessage(this.formatText(location));
         sender.sendMessage(this.formatText("Direction: " + direction));
+        sender.sendMessage(divide);
         
         if (regions == null) {
             return;
@@ -332,6 +333,13 @@ public final class BungeeLocationPlugin extends Plugin implements IPCInterface {
         final ComponentBuilder regionsBuilder = new ComponentBuilder("Regions: ").color(ChatColor.YELLOW);
         if (regions.isEmpty()) {
             sender.sendMessage(regionsBuilder.append("UNKNOWN").color(ChatColor.RED).create());
+            sender.sendMessage(divide);
+            return;
+        }
+        
+        if (regions.size() == 1 && regions.get(0).equalsIgnoreCase(LocationConstants.REGION_GLOBAL)) {
+            sender.sendMessage(regionsBuilder.append("GLOBAL REGION").color(ChatColor.AQUA).create());
+            sender.sendMessage(divide);
             return;
         }
         
@@ -347,6 +355,7 @@ public final class BungeeLocationPlugin extends Plugin implements IPCInterface {
         }
         
         sender.sendMessage(regionsBuilder.create());
+        sender.sendMessage(divide);
     }
     
     /**
