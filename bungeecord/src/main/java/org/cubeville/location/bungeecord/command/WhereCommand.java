@@ -35,11 +35,11 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.TabExecutor;
+import org.cubeville.cvplayerdata.PlayerDataManager;
 import org.cubeville.location.bungeecord.BungeeLocationPlugin;
 import org.bspfsystems.bungeelocation.core.LocationConstants;
 import org.cubeville.cvipc.CVIPC;
 import org.cubeville.cvplayerdata.CVPlayerData;
-import org.cubeville.cvplayerdata.playerdata.PlayerDataManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
